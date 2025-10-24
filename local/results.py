@@ -5,9 +5,9 @@ import pandas as pd
 import preparation as prep
 import seaborn as sns
 import utils
-import textwrap
 
-from os.path import join
+from os import makedirs
+from os.path import dirname, join
 from typing import Dict, List
 
 def bottom_n_features(scores_df: pd.DataFrame, n_bottom: int = 3):
@@ -241,7 +241,7 @@ def grouped_box_nfeatures_typescore(scores: Dict, save_path: str = None):
 
     plt.show()
 
-def mixed_box_kde(scores: Dict):
+def mixed_box_kde(scores: Dict, save_path: str = None):
     # Get all metric enums present in the actual scores DataFrame
     available_metrics = set(scores['actual'].columns.values)
     metrics = [m for m in utils.title_map.keys() if m.name in available_metrics]
@@ -374,8 +374,13 @@ def mixed_box_kde(scores: Dict):
         loc="lower right", bbox_to_anchor=(1, 0), ncol=len(labels)
     )
 
-    plt.savefig(join("assets", "mixed_plots.png"), dpi=600)
-    plt.show()
+    if save_path:
+        makedirs(dirname(save_path), exist_ok=True)
+        plt.savefig(save_path, dpi=600)
+        plt.close()
+        print(f"mixed_box_kde(): plot saved to {save_path}")
+    else:
+        plt.show()
 
 def top_n_features(scores_df: pd.DataFrame, n_top: int = 3):
     scores_top_n = []
