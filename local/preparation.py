@@ -3,11 +3,16 @@ import pandas as pd
 import utils
 
 def get_voa_levels(scores_df):
-    scores_df['LEVEL'] = scores_df['ID'].str.strip().str[-1].astype(int)
+    # Extract last character from ID, convert to numeric with nullable integer dtype
+    last_char = scores_df['ID'].astype(str).str.strip().str[-1]
+    level_nums = pd.to_numeric(last_char, errors='coerce').astype('Int64')
 
-    scores_df.loc[scores_df['LEVEL'] == 1, 'LEVEL'] = "beginner"
-    scores_df.loc[scores_df['LEVEL'] == 2, 'LEVEL'] = "intermediate"
-    scores_df.loc[scores_df['LEVEL'] == 3, 'LEVEL'] = "advanced"
+    # Map numeric levels to string labels
+    mapping = {1: "beginner", 2: "intermediate", 3: "advanced"}
+    scores_df['LEVEL'] = level_nums.map(mapping)
+
+    # Fill unmapped/invalid entries with a safe default
+    scores_df['LEVEL'] = scores_df['LEVEL'].fillna("unknown")
 
     return scores_df
 
