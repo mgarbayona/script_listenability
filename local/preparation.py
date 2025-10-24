@@ -1,0 +1,82 @@
+import numpy as np
+import pandas as pd
+import utils
+
+def get_voa_levels(scores_df):
+    scores_df['LEVEL'] = scores_df['ID'].str.strip().str[-1].astype(int)
+
+    scores_df.loc[scores_df['LEVEL'] == 1, 'LEVEL'] = "beginner"
+    scores_df.loc[scores_df['LEVEL'] == 2, 'LEVEL'] = "intermediate"
+    scores_df.loc[scores_df['LEVEL'] == 3, 'LEVEL'] = "advanced"
+
+    return scores_df
+
+def load_scores(scores_path: str):
+    """
+    Load scores from a given path (directory + filename)
+
+    Parameters
+    ----------
+    scores_path : string
+        Path of the CSV file containing the scores
+
+    Returns
+    -------
+    scores_df : pandas.DataFrame
+        Record of scores for each material
+    """
+    scores_df = pd.read_csv(scores_path)
+    scores_df.columns = scores_df.columns.str.upper()
+
+    scores_df = map_to_levels(scores_df=scores_df)
+    scores_df = get_voa_levels(scores_df=scores_df)
+
+    return scores_df
+
+def load_voa_data():
+    scores = {
+        'actual': load_scores(
+            scores_path="data/voa/listenability-scores_voa-actual.csv"), 
+        'ka5': load_scores(
+            scores_path="data/kald-aspire/listenability-scores_ka5.csv"), 
+        'gws': load_scores(
+            scores_path="data/google-web-speech/listenability-scores_gws.csv"), 
+        }
+
+    return scores
+
+def map_to_levels(scores_df):
+    """
+    Map raw scores to numerical levels
+
+    Parameters
+    ----------
+    scores_df : pandas.DataFrame
+        Record of raw scores for each material
+
+    Returns
+    -------
+    scores_df : pandas.DataFrame
+        Record of raw scores and corresponding numerical levels for each
+        material
+    """
+    metrics = list(
+        set(utils.title_map.keys()).intersection(scores_df.columns.values)
+    )
+
+    for metric in metrics:
+        col_name = metric + '_cat'
+        
+        metric_enum = utils.Metric[metric]
+        bins = list(utils.bins_map[metric_enum])  # Make a copy as a list
+        bins.append(np.inf)  # Add inf without modifying the original
+
+        labels = list(range(0, len(bins) - 1))
+        if metric == "FRE":
+            labels = labels[::-1]
+
+        scores_df[col_name] = pd.to_numeric(
+            pd.cut(scores_df[metric], bins, labels=labels)
+        )
+
+    return scores_df
