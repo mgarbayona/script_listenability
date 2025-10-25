@@ -110,3 +110,9 @@ mapper_voa_transcript_to_color = {
     'ka5': "#0072B2", 
     'gws': "#D55E00", 
 }
+
+pretty_labels = {
+    'actual': "VOA Actual", 
+    'ka5': "Kaldi ASpIRE (KA5)", 
+    'gws': "Google Web Speech (GWS)",
+}
