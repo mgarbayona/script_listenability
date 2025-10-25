@@ -25,11 +25,11 @@ Key aspects:
 ---
 
 ## 🧩 Repository Structure
-assets/issc/ # Figures and plots used in the ISSC paper
-data/ # Processed data and example transcripts
-local/ # Local scripts for running experiments
-LICENSE # Apache 2.0 License
-README.md # Project overview
+- assets/issc/ # Figures and plots used in the ISSC paper
+- data/ # Processed data and example transcripts
+- local/ # Local scripts for running experiments
+- LICENSE # Apache 2.0 License
+- README.md # Project overview
 
 ---
 
