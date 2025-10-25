@@ -2,6 +2,18 @@ import numpy as np
 import pandas as pd
 import utils
 
+def format_feature_label(label):
+    if isinstance(label, str):
+        label = label.strip("()").replace("'", "").replace(" ", "")
+        parts = label.split(",")
+        return ("-".join(parts)).strip("-")
+    
+    elif isinstance(label, (tuple, list)):
+        return "-".join(label).strip("-")
+    
+    else:
+        return str(label)
+
 def get_voa_levels(scores_df):
     # Extract last character from ID, convert to numeric with nullable integer dtype
     last_char = scores_df['ID'].astype(str).str.strip().str[-1]
@@ -15,6 +27,22 @@ def get_voa_levels(scores_df):
     scores_df['LEVEL'] = scores_df['LEVEL'].fillna("unknown")
 
     return scores_df
+
+def load_classifier_data(classifier_type: str = "2_way"):
+    data_path = {
+        'actual': f"data/voa/log_reg-{classifier_type}-voa_actual.csv",
+        'ka5': f"data/kaldi_aspire/log_reg-{classifier_type}-ka5.csv",
+        'gws': f"data/google_web_speech/log_reg-{classifier_type}-gws.csv",
+    }
+
+    accuracies = {}
+    for key, path in data_path.items():
+        accuracies[key] = pd.read_csv(path)
+        accuracies[key]['features'] = accuracies[key]['features'].apply(
+            lambda feat_label: format_feature_label(feat_label)
+        )
+
+    return accuracies
 
 def load_scores(scores_path: str):
     """
