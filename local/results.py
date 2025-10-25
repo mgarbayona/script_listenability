@@ -87,16 +87,6 @@ def grouped_box_features(
     n_labels = scores_df['features_str'].nunique() if order is None else len(order)
     flip = n_labels > 20
 
-    def format_label(label):
-        if isinstance(label, str):
-            label = label.strip("()").replace("'", "").replace(" ", "")
-            parts = label.split(",")
-            return ("-".join(parts)).strip("-")
-        elif isinstance(label, (tuple, list)):
-            return "-".join(label).strip("-")
-        else:
-            return str(label)
-
     if order is None:
         median_by_feature = scores_df.groupby('features_str')['accs'].median()
         if not flip:
@@ -108,7 +98,9 @@ def grouped_box_features(
         feature_labels = order
 
     # Format feature_labels for plotting
-    formatted_labels = [format_label(label) for label in feature_labels]
+    formatted_labels = [
+        prep.format_feature_label(label) for label in feature_labels
+    ]
 
     palette = {}
     for label, formatted in zip(feature_labels, formatted_labels):
@@ -120,7 +112,7 @@ def grouped_box_features(
     # Add a new column for formatted labels for plotting
     scores_df = scores_df.copy()
     scores_df['features_str_formatted'] = scores_df['features_str'].apply(
-        format_label
+        prep.format_feature_label
     )
 
     if flip:
@@ -230,7 +222,10 @@ def grouped_box_nfeatures_typescore(scores: Dict, save_path: str = None):
 
     ax.grid(True, which="major", axis="y", linestyle="--")
 
-    plt.legend(title="Transcript", loc="lower right")
+    # Replace legend labels with pretty labels when available
+    handles, labels = ax.get_legend_handles_labels()
+    pretty = [utils.pretty_labels.get(l, l) for l in labels]
+    ax.legend(handles, pretty, title="Transcript", loc="lower right")
 
     plt.yticks(np.linspace(0.1, 1.0, 10))
 
@@ -240,6 +235,113 @@ def grouped_box_nfeatures_typescore(scores: Dict, save_path: str = None):
         plt.savefig(save_path, dpi=300)
 
     plt.show()
+
+def line_accuracies(
+    accuracies: Dict[str, pd.DataFrame],
+    features_col: str = "features",
+    mean_col: str = "mean",
+    stdev_col: str = "stdev",
+    figsize: tuple = (10, 6),
+    save_path: str = None,
+):
+    """
+    Plot line chart of accuracies for multiple score types.
+    - accuracies: dict mapping legend label -> DataFrame
+      Each DataFrame must contain columns named by features_col, mean_col, stdev_col.
+    - Dots represent the 'mean' values; error bars use 'stdev'.
+    - X-axis labels come from the 'features' column (union, order preserved).
+    """
+    # Build ordered union of feature labels (preserve first appearance)
+    seen = []
+    for df in accuracies.values():
+        for f in df[features_col].astype(str).tolist():
+            if f not in seen:
+                seen.append(f)
+    feature_labels = seen
+    x_ticks = np.arange(len(feature_labels))
+
+    sns.set_style("whitegrid")
+    fig, ax = plt.subplots(figsize=figsize)
+
+    # color palette
+    palette = sns.color_palette(n_colors=len(accuracies))
+    palette_map = {k: palette[i] for i, k in enumerate(accuracies.keys())}
+
+    for key, df in accuracies.items():
+        df = df.copy()
+        # ensure features are strings
+        df[features_col] = df[features_col].astype(str)
+        # determine x positions for this dataframe
+        x_pos = [feature_labels.index(f) for f in df[features_col]]
+
+        pretty_label = utils.pretty_labels.get(key, key)
+
+        # plot markers only (no connecting lines)
+        sns.scatterplot(
+            x=x_pos,
+            y=df[mean_col],
+            s=65,
+            color=palette_map[key],
+            edgecolor="w",
+            linewidth=0.5,
+            label=pretty_label,  # use pretty label here
+            ax=ax,
+        )
+
+        # add error bars from stdev using matplotlib
+        ax.errorbar(
+            x_pos,
+            df[mean_col],
+            yerr=df[stdev_col],
+            fmt="none",
+            ecolor=palette_map[key],
+            elinewidth=1.25,
+            capsize=4,
+            alpha=0.7,
+        )
+
+    ax.set_xticks(x_ticks)
+    ax.set_xticklabels(feature_labels, rotation=90)
+    ax.set_xlabel("features")
+    ax.set_ylabel("classifier accuracy")
+
+    # Dynamically compute ymin/ymax from means ± stdev across all input dataframes
+    all_lows = []
+    all_highs = []
+    for df in accuracies.values():
+        df_loc = df.copy()
+        m = pd.to_numeric(df_loc.get(mean_col), errors='coerce').fillna(0.0)
+        s = pd.to_numeric(df_loc.get(stdev_col, pd.Series(0, index=df_loc.index)), errors='coerce').fillna(0.0)
+        if not m.empty:
+            all_lows.append((m - s).min())
+            all_highs.append((m + s).max())
+
+    if all_lows and all_highs:
+        ymin = float(np.nanmin(all_lows))
+        ymax = float(np.nanmax(all_highs))
+        # Round to nearest tenth outward
+        ymin_rounded = np.floor(ymin * 10.0) / 10.0
+        ymax_rounded = np.ceil(ymax * 10.0) / 10.0
+        if np.isclose(ymin_rounded, ymax_rounded):
+            ymin_rounded = max(0.0, ymin_rounded - 0.1)
+            ymax_rounded = min(1.0, ymax_rounded + 0.1)
+        ymin_rounded = max(0.0, ymin_rounded)
+        ymax_rounded = min(1.0, ymax_rounded)
+        ax.set_ylim(ymin_rounded, ymax_rounded)
+        # set yticks at tenths for clarity
+        ax.set_yticks(np.arange(ymin_rounded, ymax_rounded + 1e-9, 0.1))
+
+    ax.grid(True, which="major", axis="y", linestyle="--")
+
+    plt.tight_layout()
+
+    if save_path:
+        makedirs(dirname(save_path), exist_ok=True)
+        plt.savefig(save_path, dpi=300)
+        plt.close()
+        print(f"line_accuracies(): plot saved to {save_path}")
+    else:
+        plt.show()
 
 def mixed_box_kde(scores: Dict, save_path: str = None):
     # Get all metric enums present in the actual scores DataFrame
