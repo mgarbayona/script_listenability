@@ -41,11 +41,11 @@ def load_scores(scores_path: str):
 def load_voa_data():
     scores = {
         'actual': load_scores(
-            scores_path="data/voa/listenability-scores_voa-actual.csv"), 
+            scores_path="data/voa/listenability_scores-voa_actual.csv"), 
         'ka5': load_scores(
-            scores_path="data/kald-aspire/listenability-scores_ka5.csv"), 
+            scores_path="data/kaldi_aspire/listenability_scores-ka5.csv"), 
         'gws': load_scores(
-            scores_path="data/google-web-speech/listenability-scores_gws.csv"), 
+            scores_path="data/google_web_speech/listenability_scores-gws.csv"), 
         }
 
     return scores
