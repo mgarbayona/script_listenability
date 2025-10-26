@@ -52,3 +52,9 @@ conda activate listenability
 pip install -r requirements.txt
 ```
 
+---
+
+## 🧠 Acknowledgements
+
+This research was supported by the Science Foundation Ireland Centre for Research Training in Digitally-Enhanced Reality (d-real) under Grant No. 18/CRT/6224.
+We also acknowledge the Voice of America (VOA) Learning English program for providing access to educational materials used in this study.
