@@ -25,11 +25,15 @@ Key aspects:
 ---
 
 ## 🧩 Repository Structure
-- assets/issc/ # Figures and plots used in the ISSC paper
-- data/ # Processed data and example transcripts
-- local/ # Local scripts for running experiments
-- LICENSE # Apache 2.0 License
-- README.md # Project overview
+
+- `assets/issc/` — Figures and plots used in the ISSC paper  
+- `data/` — Processed data and example transcripts  
+- `local/` — Scripts for running experiments and ASR pipelines  
+  - `kaldi/` — Files to run Kaldi’s ASpIRE Chain Model on VOA data  
+  - `resources/` — Resources needed to compute different text statistics  
+- `LICENSE` — Apache 2.0 License  
+- `README.md` — Project overview  
+
 
 ---
 
