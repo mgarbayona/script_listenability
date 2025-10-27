@@ -4,7 +4,7 @@
 
 This repository accompanies the paper:
 
-> **M. Gringo Angelo Bayona, A. Hines, E. Gilmartin, and E. Uí Dhonnchadha**,  
+> **M. G. A. R. Bayona, A. Hines, E. Gilmartin, and E. Uí Dhonnchadha**,  
 > *"An Evaluation of the Use of Text-Based Comprehensibility Measures on Online Spoken Language Learning Materials,"*  
 > 2023 34th Irish Signals and Systems Conference (ISSC), Dublin, Ireland, 2023, pp. 1–6.  
 > DOI: [10.1109/ISSC59246.2023.10162065](https://doi.org/10.1109/ISSC59246.2023.10162065)
