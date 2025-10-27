@@ -52,6 +52,7 @@ pip install -r requirements.txt
 
 This project also makes use of the following external tools and libraries:
 
+- **[Punctuator](https://github.com/ottokart/punctuator2)** - for adding punctuations to ASR output
 - **[Syllabify](https://github.com/cainesap/syllabify)** — for syllable segmentation  
 - **[Textstat](https://github.com/textstat/textstat)** — for calculating text statistics and for cross-checking the implementation of standard readability metrics
 
