@@ -55,7 +55,6 @@ langcodes==3.3.0
 lazy-object-proxy==1.9.0
 Levenshtein==0.18.1
 libcst==0.3.21
--e git+https://gitlab.com/mikegringo/listenability-experiments.git@7c99424db09bf5a0218ea6011cb69cc487030211#egg=local_cainesap_syllabify&subdirectory=local_cainesap_syllabify
 loguru==0.6.0
 lxml==4.7.1
 MarkupSafe==2.1.1

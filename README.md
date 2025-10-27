@@ -33,24 +33,24 @@ Key aspects:
 
 ---
 
-## 🚀 Quickstart
+## 🧰 Environment
+This project was developed and tested with Python 3.9. To create a matching conda environment:
 
-Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/mgarbayona/script_listenability.git
 cd script_listenability
-pip install -r requirements.txt
-```
-
----
-
-## 🧰 Environment
-This project was developed and tested with Python 3.12. To create a matching conda environment:
-```bash
-conda create -n listenability python=3.12 -c conda-forge
+conda create -n listenability python=3.9 -c conda-forge
 conda activate listenability
 pip install -r requirements.txt
 ```
+
+### 🧩 Additional Dependencies
+
+This project also makes use of the following external tools and libraries:
+
+- **[Syllabify](https://github.com/cainesap/syllabify)** — for syllable segmentation  
+- **[Textstat](https://github.com/textstat/textstat)** — for calculating text statistics and for cross-checking the implementation of standard readability metrics
+
 
 ---
 
