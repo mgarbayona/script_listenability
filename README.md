@@ -1,4 +1,4 @@
-# script_listenability
+# Script Listenability
 
 **Text-based measures for evaluating the comprehensibility of spoken materials**
 
